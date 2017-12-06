@@ -1,0 +1,15 @@
+﻿  PhysicsEngine.cpp
+  Octree.cpp
+d:\csc5803\gametech 2017\build\ncltech\octree.cpp(97): warning C4018: '<': signed/unsigned mismatch
+d:\csc5803\gametech 2017\build\ncltech\octree.cpp(111): warning C4018: '<': signed/unsigned mismatch
+  CommonUtils.cpp
+  Generating Code...
+  Compiling...
+  SphereCollisionShape.cpp
+  SceneManager.cpp
+  PhysicsNode.cpp
+  Manifold.cpp
+  CuboidCollisionShape.cpp
+  CollisionDetectionSAT.cpp
+  Generating Code...
+  ncltech.vcxproj -> D:\CSC5803\GameTech 2017\Build\Debug\ncltech.lib
