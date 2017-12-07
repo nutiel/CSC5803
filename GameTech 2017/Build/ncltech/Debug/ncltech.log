@@ -1,15 +1,31 @@
-﻿  PhysicsEngine.cpp
-  Octree.cpp
-d:\csc5803\gametech 2017\build\ncltech\octree.cpp(97): warning C4018: '<': signed/unsigned mismatch
-d:\csc5803\gametech 2017\build\ncltech\octree.cpp(111): warning C4018: '<': signed/unsigned mismatch
-  CommonUtils.cpp
-  Generating Code...
-  Compiling...
-  SphereCollisionShape.cpp
+﻿  SphereCollisionShape.cpp
+  ScreenPicker.cpp
   SceneManager.cpp
   PhysicsNode.cpp
+  PhysicsEngine.cpp
+  Octree.cpp
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(60): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(62): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(64): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(66): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(69): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(71): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(73): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(75): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(78): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(80): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(82): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(84): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(148): warning C4018: '<': signed/unsigned mismatch
+d:\csc5803\csc5803\gametech 2017\build\ncltech\octree.cpp(162): warning C4018: '<': signed/unsigned mismatch
+  NetworkBase.cpp
   Manifold.cpp
+  Hull.cpp
+  GraphicsPipeline.cpp
+  GeometryUtils.cpp
   CuboidCollisionShape.cpp
+  CommonUtils.cpp
+  CommonMeshes.cpp
   CollisionDetectionSAT.cpp
   Generating Code...
-  ncltech.vcxproj -> D:\CSC5803\GameTech 2017\Build\Debug\ncltech.lib
+  ncltech.vcxproj -> D:\CSC5803\CSC5803\GameTech 2017\Build\Debug\ncltech.lib

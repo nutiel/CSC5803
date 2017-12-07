@@ -6,6 +6,7 @@
 
 #include "TestScene.h"
 #include "EmptyScene.h"
+#include "BallPool.h"
 
 const Vector4 status_colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 const Vector4 status_colour_header = Vector4(0.8f, 0.9f, 1.0f, 1.0f);
@@ -53,7 +54,7 @@ void Initialize()
 	//Enqueue All Scenes
 	SceneManager::Instance()->EnqueueScene(new TestScene("GameTech #1 - Framework Sandbox!"));
 	SceneManager::Instance()->EnqueueScene(new EmptyScene("GameTech #2 - Peace and quiet"));
-	SceneManager::Instance()->EnqueueScene(new EmptyScene("GameTech #3 - More peace and quiet"));
+	SceneManager::Instance()->EnqueueScene(new BallPool("GameTech #3 - More peace and quiet"));
 }
 
 // Print Debug Info
@@ -87,6 +88,40 @@ void PrintStatusEntries()
 	NCLDebug::AddStatusEntry(status_colour, "");
 }
 
+//Shooting spheres from the cameras position
+void ShootBall() {
+	Vector3 c = GraphicsPipeline::Instance()->GetCamera()->GetPosition();
+
+	//Vector3 f = Matrix3::Transpose(GraphicsPipeline::Instance()->GetCamera()->BuildViewMatrix())  * Vector3(0, 0, -1);
+
+	float p = GraphicsPipeline::Instance()->GetCamera()->GetPitch();
+	float y = GraphicsPipeline::Instance()->GetCamera()->GetYaw();
+
+	float xd, yd, zd;
+
+	xd = -sin(y * PI / 180);
+	yd = sin(p * PI / 180);
+	zd = -cos(y * PI / 180);
+
+	GameObject *m3_Sphere = CommonUtils::BuildSphereObject("",
+		c,										//Position
+		0.5f,									//Radius
+		true,									//Has Physics Object
+		1.0f,									// Inverse Mass = 1 / 1kg mass
+		true,									//No Collision Shape Yet
+		true,									//Dragable by the user
+		CommonUtils::GenColor(0.3f, 1.0f));		//Color
+
+	SceneManager::Instance()->GetCurrentScene()->AddGameObject(m3_Sphere);
+
+	m3_Sphere->Physics()->SetLinearVelocity(Vector3(30 * xd, 30 * yd, 30 * zd));
+	//m3_Sphere->Physics()->SetLinearVelocity(f * 10);
+
+	m3_Sphere->Physics()->SetForce(Vector3(0.f, 0.f, 0.0f));
+
+	m3_Sphere->Physics()->SetOrientation(Quaternion());
+	m3_Sphere->Physics()->SetAngularVelocity(Vector3(0.f, 0.f, -2.0f * PI));
+}
 
 // Process Input
 //  - Handles all program wide keyboard inputs for
@@ -113,6 +148,9 @@ void HandleKeyboardInputs()
 
 	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_G))
 		show_perf_metrics = !show_perf_metrics;
+
+	//shoot from camera for day 2 tasks
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_J)) ShootBall();
 }
 
 

@@ -143,7 +143,7 @@ public:
 protected:
 	//Scene  
 	std::string					friendlyName;
-	Scene*						scene;
+	Scene*						scene = nullptr;
 
 	//Components
 	RenderNode*					renderNode;

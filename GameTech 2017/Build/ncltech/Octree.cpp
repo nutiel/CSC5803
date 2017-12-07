@@ -1,7 +1,7 @@
 #include "Octree.h"
 #include <nclgl\NCLDebug.h>
 
-#define THRESHHOLD 5
+#define THRESHHOLD 15
 
 Octree::Octree(Vector3 c, float hdim, Octree *parent) :
 	centre(c),
@@ -54,9 +54,9 @@ void Octree::belongs(PhysicsNode *pnode) {
 
 void Octree::sortOct() {
 
-	/*//Show octs//
+	//Show octs//
 
-	NCLDebug::DrawThickLine(Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z - half_dimension), 
+	NCLDebug::DrawThickLine(Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z - half_dimension),
 		Vector3(centre.x + half_dimension, centre.y + half_dimension, centre.z - half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //1-2
 	NCLDebug::DrawThickLine(Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z - half_dimension),
 		Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z + half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //1-4
@@ -83,17 +83,19 @@ void Octree::sortOct() {
 	NCLDebug::DrawThickLine(Vector3(centre.x + half_dimension, centre.y + half_dimension, centre.z + half_dimension),
 		Vector3(centre.x + half_dimension, centre.y - half_dimension, centre.z + half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //3-7
 
-	//Show octs//*/
+	//Show octs//
 
-	if (children.size() > THRESHHOLD) {
-		flu = new Octree(Vector3(centre.x - half_dimension / 2, centre.y + half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
-		fld = new Octree(Vector3(centre.x - half_dimension / 2, centre.y - half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
-		fru = new Octree(Vector3(centre.x + half_dimension / 2, centre.y + half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
-		frd = new Octree(Vector3(centre.x + half_dimension / 2, centre.y - half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
-		blu = new Octree(Vector3(centre.x - half_dimension / 2, centre.y + half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
-		bld = new Octree(Vector3(centre.x - half_dimension / 2, centre.y - half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
-		bru = new Octree(Vector3(centre.x + half_dimension / 2, centre.y + half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
-		brd = new Octree(Vector3(centre.x + half_dimension / 2, centre.y - half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
+	if (children.size() > THRESHHOLD && depth < 4) {
+		if (flu == NULL) {
+			flu = new Octree(Vector3(centre.x - half_dimension / 2, centre.y + half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
+			fld = new Octree(Vector3(centre.x - half_dimension / 2, centre.y - half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
+			fru = new Octree(Vector3(centre.x + half_dimension / 2, centre.y + half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
+			frd = new Octree(Vector3(centre.x + half_dimension / 2, centre.y - half_dimension / 2, centre.z + half_dimension / 2), half_dimension / 2, this);
+			blu = new Octree(Vector3(centre.x - half_dimension / 2, centre.y + half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
+			bld = new Octree(Vector3(centre.x - half_dimension / 2, centre.y - half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
+			bru = new Octree(Vector3(centre.x + half_dimension / 2, centre.y + half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
+			brd = new Octree(Vector3(centre.x + half_dimension / 2, centre.y - half_dimension / 2, centre.z - half_dimension / 2), half_dimension / 2, this);
+		}
 
 		for (size_t i = 0; i < children.size(); ++i)
 		{
@@ -117,6 +119,25 @@ void Octree::sortOct() {
 		bld->sortOct();
 		bru->sortOct();
 		brd->sortOct();
+	}
+	else if (flu != NULL) {
+		flu->sortOct();
+		fld->sortOct();
+		fru->sortOct();
+		frd->sortOct();
+		blu->sortOct();
+		bld->sortOct();
+		bru->sortOct();
+		brd->sortOct();
+
+		SAFE_DELETE(flu);
+		SAFE_DELETE(fld);
+		SAFE_DELETE(fru);
+		SAFE_DELETE(frd);
+		SAFE_DELETE(blu);
+		SAFE_DELETE(bld);
+		SAFE_DELETE(bru);
+		SAFE_DELETE(brd);
 	}
 }
 

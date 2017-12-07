@@ -1,4 +1,1 @@
-﻿  Octree.cpp
-Octree.cpp(81): warning C4018: '<': signed/unsigned mismatch
-Octree.cpp(95): warning C4018: '<': signed/unsigned mismatch
-  ncltech.vcxproj -> D:\CSC5803\GameTech 2017\Build\Release\ncltech.lib
+﻿  ncltech.vcxproj -> D:\CSC5803\CSC5803\GameTech 2017\Build\Release\ncltech.lib
