@@ -56,7 +56,7 @@ void Octree::sortOct() {
 
 	//Show octs//
 
-	NCLDebug::DrawThickLine(Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z - half_dimension),
+	/*NCLDebug::DrawThickLine(Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z - half_dimension),
 		Vector3(centre.x + half_dimension, centre.y + half_dimension, centre.z - half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //1-2
 	NCLDebug::DrawThickLine(Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z - half_dimension),
 		Vector3(centre.x - half_dimension, centre.y + half_dimension, centre.z + half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //1-4
@@ -81,7 +81,7 @@ void Octree::sortOct() {
 	NCLDebug::DrawThickLine(Vector3(centre.x + half_dimension, centre.y + half_dimension, centre.z - half_dimension),
 		Vector3(centre.x + half_dimension, centre.y - half_dimension, centre.z - half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //2-6
 	NCLDebug::DrawThickLine(Vector3(centre.x + half_dimension, centre.y + half_dimension, centre.z + half_dimension),
-		Vector3(centre.x + half_dimension, centre.y - half_dimension, centre.z + half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //3-7
+		Vector3(centre.x + half_dimension, centre.y - half_dimension, centre.z + half_dimension), 0.01, Vector4(0.0f, 0.0f, 0.0f, 1.0f)); //3-7*/
 
 	//Show octs//
 

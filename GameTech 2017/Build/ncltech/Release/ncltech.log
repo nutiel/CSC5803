@@ -1,19 +1,18 @@
-﻿  CommonUtils.cpp
+﻿  CollisionDetectionSAT.cpp
+  CommonMeshes.cpp
+  CommonUtils.cpp
+  CuboidCollisionShape.cpp
+  GeometryUtils.cpp
+  GraphicsPipeline.cpp
+  Hull.cpp
+  Manifold.cpp
+  NetworkBase.cpp
   Octree.cpp
-Octree.cpp(60): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(62): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(64): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(66): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(69): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(71): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(73): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(75): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(78): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(80): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(82): warning C4305: 'argument': truncation from 'double' to 'float'
-Octree.cpp(84): warning C4305: 'argument': truncation from 'double' to 'float'
 Octree.cpp(148): warning C4018: '<': signed/unsigned mismatch
 Octree.cpp(162): warning C4018: '<': signed/unsigned mismatch
   PhysicsEngine.cpp
+  PhysicsNode.cpp
   SceneManager.cpp
+  ScreenPicker.cpp
+  SphereCollisionShape.cpp
   ncltech.vcxproj -> D:\CSC5803\CSC5803\GameTech 2017\Build\Release\ncltech.lib

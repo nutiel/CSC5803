@@ -107,7 +107,7 @@ void ShootBall() {
 		c,										//Position
 		0.5f,									//Radius
 		true,									//Has Physics Object
-		1.0f,									// Inverse Mass = 1 / 1kg mass
+		0.3f,									// Inverse Mass = 1 / 1kg mass
 		true,									//No Collision Shape Yet
 		true,									//Dragable by the user
 		CommonUtils::GenColor(0.3f, 1.0f));		//Color
