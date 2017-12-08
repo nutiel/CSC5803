@@ -46,18 +46,20 @@ public:
 					Vector3(i*0.5 - CSIZE/2, 5, j*0.5 - CSIZE/2),				//Position
 					0.1f,									//Radius
 					true,									//Has Physics Object
-					i==0 ? 0.0f : 1.0f,									// Inverse Mass
+					i==0 && (j == 0 || j == CSIZE - 1) ? 0.0f : 1.0f,									// Inverse Mass
 					true,									//No Collision Shape Yet
 					true,									//Dragable by the user
-					CommonUtils::GenColor(0.5f, 0.0f));		//Color
+					CommonUtils::GenColor(0.5f, 1.0f));		//Color
 
 				s.push_back(ball);
 			}
 		}
-		
-		SpringConstraint* constraint;
 
-		/*for (int i = 0; i < CSIZE; i++) {
+		//Distance Constraint
+
+		/*SpringConstraint* constraint;
+
+		for (int i = 0; i < CSIZE; i++) {
 			for (int j = 0; j < CSIZE; j++) {
 				if (i - 1 >= 0) {
 					constraint = new SpringConstraint(
@@ -66,7 +68,6 @@ public:
 						s[i * CSIZE + j]->Physics()->GetPosition(),	//Attachment Position on Object A	-> Currently the centre
 						s[(i - 1) * CSIZE + j]->Physics()->GetPosition());	//Attachment Position on Object B	-> Currently the centre  
 					PhysicsEngine::Instance()->AddConstraint(constraint);
-					NCLDebug::DrawThickLine(s[i * CSIZE + j]->Physics()->GetPosition(), s[(i - 1) * CSIZE + j]->Physics()->GetPosition(), 0.05, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 				}
 
 				if (j - 1 >= 0) {
@@ -76,7 +77,6 @@ public:
 						s[i * CSIZE + j]->Physics()->GetPosition(),	//Attachment Position on Object A	-> Currently the centre
 						s[(i) * CSIZE + (j-1)]->Physics()->GetPosition());	//Attachment Position on Object B	-> Currently the centre  
 					PhysicsEngine::Instance()->AddConstraint(constraint);
-					NCLDebug::DrawThickLine(s[i * CSIZE + j]->Physics()->GetPosition(), s[(i) * CSIZE + (j-1)]->Physics()->GetPosition(), 0.05, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 				}
 
 				if (i - 1 >= 0 && j - 1 >= 0) {
@@ -86,10 +86,14 @@ public:
 						s[i * CSIZE + j]->Physics()->GetPosition(),	//Attachment Position on Object A	-> Currently the centre
 						s[(i - 1) * CSIZE + (j - 1)]->Physics()->GetPosition());	//Attachment Position on Object B	-> Currently the centre  
 					PhysicsEngine::Instance()->AddConstraint(constraint);
-					NCLDebug::DrawThickLine(s[i * CSIZE + j]->Physics()->GetPosition(), s[(i-1)* CSIZE + (j - 1)]->Physics()->GetPosition(), 0.05, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 				}
 			}
 		}*/
+
+
+		//Spring Constraint
+
+		SpringConstraint* constraint;
 
 		for (int i = 0; i < CSIZE; i++) {
 			for (int j = 0; j < CSIZE; j++) {
@@ -137,29 +141,29 @@ public:
 	{
 		Scene::OnUpdateScene(dt);
 
-		/*for (int i = 0; i < CSIZE*CSIZE; i++) {
-			if ((i+1)*CSIZE + i < CSIZE && i*CSIZE + (i+1) < CSIZE) {
+		//Draw Polygons between cloth nodes
+		for (int i = 0; i < CSIZE - 1; i++) {
+			for (int j = 0; j < CSIZE - 1; j++) {
 
 				Vector3 *v = new Vector3[4];
 
-				v[0] = (s[i * CSIZE + i]->Physics()->GetPosition());
-				v[1] = (s[(i + 1) * CSIZE + (i)]->Physics()->GetPosition());
-				v[2] = (s[(i + 1) * CSIZE + (i + 1)]->Physics()->GetPosition());
-				v[3] = (s[(i)* CSIZE + (i + 1)]->Physics()->GetPosition());
+				v[0] = (s[i*CSIZE + j]->Physics()->GetPosition());
+				v[1] = (s[i*CSIZE + (j + 1)]->Physics()->GetPosition());
+				v[2] = (s[(i + 1)*CSIZE + (j + 1)]->Physics()->GetPosition());
+				v[3] = (s[(i+1)*CSIZE + j]->Physics()->GetPosition());
 
-				NCLDebug::DrawPolygon(4, v, Vector4(0.2f, 0.3f, 0.6f, 0.6f));
+				NCLDebug::DrawPolygon(4, v, Vector4(0.7f, 0.3f, 0.2f, 0.5f));
+
+				v[0] = (s[i*CSIZE + j]->Physics()->GetPosition());
+				v[1] = (s[(i + 1)*CSIZE + j]->Physics()->GetPosition());
+				v[2] = (s[(i + 1)*CSIZE + (j + 1)]->Physics()->GetPosition());
+				v[3] = (s[i*CSIZE + (j + 1)]->Physics()->GetPosition());
+
+				NCLDebug::DrawPolygon(4, v, Vector4(0.7f, 0.3f, 0.2f, 0.5f));
 			}
-		}*/
-
-		Vector3 *v = new Vector3[4];
-
-		v[0] = Vector3(1.0f, 2.0f, 1.0f);
-		v[1] = Vector3(-1.0f, 2.0f, 1.0f);
-		v[2] = Vector3(-1.0f, 2.0f, -1.0f);
-		v[3] = Vector3(1.0f, 2.0f, -1.0f);
-
-		NCLDebug::DrawPolygon(4, v, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+		}
 		
+		//Draw Constraint lines
 		/*for (int i = 0; i < CSIZE; i++) {
 			for (int j = 0; j < CSIZE; j++) {
 				if (i - 1 >= 0) {

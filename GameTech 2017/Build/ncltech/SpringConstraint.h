@@ -4,7 +4,7 @@
 #include "PhysicsEngine.h"
 #include <nclgl\NCLDebug.h>
 
-#define SPR_K 0.7
+#define SPR_K 750.0
 
 class SpringConstraint : public Constraint
 {
@@ -33,7 +33,9 @@ public:
 
 	//Solves the constraint and applies a velocity impulse to the two
 	// objects in order to satisfy the constraint.
-	virtual void ApplyImpulse() override
+	virtual void ApplyImpulse() {}
+
+	virtual void PreSolverStep(float dt) override
 	{
 		Vector3 r1 = pnodeA->GetOrientation().ToMatrix3() * relPosA;
 		Vector3 r2 = pnodeB->GetOrientation().ToMatrix3() * relPosB;
@@ -71,6 +73,7 @@ public:
 			float jn = -(abnVel + b) / constraintMass;
 			
 			float force = -SPR_K*(targetLength - ab.Length()) - 0.5 * abnVel;
+			force = force*dt;
 
 			/*pnodeA->SetLinearVelocity(pnodeA->GetLinearVelocity() + abn * (pnodeA->GetInverseMass() * jn));
 			pnodeB->SetLinearVelocity(pnodeB->GetLinearVelocity() - abn * (pnodeB->GetInverseMass() * jn));*/

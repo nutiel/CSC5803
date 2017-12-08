@@ -53,8 +53,8 @@ void Initialize()
 
 	//Enqueue All Scenes
 	SceneManager::Instance()->EnqueueScene(new TestScene("GameTech #1 - Framework Sandbox!"));
-	SceneManager::Instance()->EnqueueScene(new EmptyScene("GameTech #2 - Peace and quiet"));
-	SceneManager::Instance()->EnqueueScene(new BallPool("GameTech #3 - More peace and quiet"));
+	SceneManager::Instance()->EnqueueScene(new EmptyScene("GameTech #2 - Cloth Scene"));
+	SceneManager::Instance()->EnqueueScene(new BallPool("GameTech #3 - BallPool Scene"));
 }
 
 // Print Debug Info
@@ -164,7 +164,7 @@ int main()
 	Window::GetWindow().GetTimer()->GetTimedMS();
 
 	//Create main game-loop
-	while (Window::GetWindow().UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
+	while (Window::GetWindow().UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE) && !Window::GetKeyboard()->KeyDown(KEYBOARD_X)) {
 		//Start Timing
 		
 		float dt = Window::GetWindow().GetTimer()->GetTimedMS() * 0.001f;	//How many milliseconds since last update?

@@ -5,6 +5,7 @@
 #include <ncltech\SceneManager.h>
 #include <ncltech\PhysicsEngine.h>
 #include <ncltech\DistanceConstraint.h>
+#include <ncltech\SpringConstraint.h>
 #include <ncltech\CommonUtils.h>
 #include <nclgl\NCLDebug.h>
 
@@ -56,7 +57,7 @@ public:
 			this->AddGameObject(ball);
 
 			//Add distance constraint between the two objects
-			DistanceConstraint* constraint = new DistanceConstraint(
+			SpringConstraint* constraint = new SpringConstraint(
 				handle->Physics(),					//Physics Object A
 				ball->Physics(),					//Physics Object B
 				handle->Physics()->GetPosition(),	//Attachment Position on Object A	-> Currently the centre
@@ -90,7 +91,7 @@ public:
 			this->AddGameObject(handle);
 			this->AddGameObject(ball);
 
-			PhysicsEngine::Instance()->AddConstraint(new DistanceConstraint(
+			PhysicsEngine::Instance()->AddConstraint(new SpringConstraint(
 				handle->Physics(),													//Physics Object A
 				ball->Physics(),													//Physics Object B
 				handle->Physics()->GetPosition() + Vector3(1.0f, 0.0f, 0.0f),		//Attachment Position on Object A	-> Currently the far right edge
