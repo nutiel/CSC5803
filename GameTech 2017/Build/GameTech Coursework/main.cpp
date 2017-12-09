@@ -7,6 +7,8 @@
 #include "TestScene.h"
 #include "EmptyScene.h"
 #include "BallPool.h"
+#include "CollisionScenarios.h"
+#include "TargetScene.h"
 
 const Vector4 status_colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 const Vector4 status_colour_header = Vector4(0.8f, 0.9f, 1.0f, 1.0f);
@@ -55,7 +57,10 @@ void Initialize()
 	SceneManager::Instance()->EnqueueScene(new TestScene("GameTech #1 - Framework Sandbox!"));
 	SceneManager::Instance()->EnqueueScene(new EmptyScene("GameTech #2 - Cloth Scene"));
 	SceneManager::Instance()->EnqueueScene(new BallPool("GameTech #3 - BallPool Scene"));
+	SceneManager::Instance()->EnqueueScene(new CollisionScenarios("GameTech #4 - Collision Scenarios Scene"));
+	SceneManager::Instance()->EnqueueScene(new TargetScene("GameTech #5 - Target Scene"));
 }
+
 
 // Print Debug Info
 //  - Prints a list of status entries to the top left
@@ -97,11 +102,12 @@ void ShootBall() {
 	float p = GraphicsPipeline::Instance()->GetCamera()->GetPitch();
 	float y = GraphicsPipeline::Instance()->GetCamera()->GetYaw();
 
-	float xd, yd, zd;
+	float xd, yd, zd, offset_y;
 
-	xd = -sin(y * PI / 180);
-	yd = sin(p * PI / 180);
-	zd = -cos(y * PI / 180);
+	xd = -sin((float)DegToRad(y));
+	yd = sin((float)DegToRad(p));
+	offset_y = cos((float)DegToRad(abs(p)));
+	zd = -cos((float)DegToRad(y));
 
 	GameObject *m3_Sphere = CommonUtils::BuildSphereObject("",
 		c,										//Position
@@ -114,7 +120,7 @@ void ShootBall() {
 
 	SceneManager::Instance()->GetCurrentScene()->AddGameObject(m3_Sphere);
 
-	m3_Sphere->Physics()->SetLinearVelocity(Vector3(30 * xd, 30 * yd, 30 * zd));
+	m3_Sphere->Physics()->SetLinearVelocity(Vector3(30 * xd*offset_y, 30 * yd, 30 * zd*offset_y));
 	//m3_Sphere->Physics()->SetLinearVelocity(f * 10);
 
 	m3_Sphere->Physics()->SetForce(Vector3(0.f, 0.f, 0.0f));

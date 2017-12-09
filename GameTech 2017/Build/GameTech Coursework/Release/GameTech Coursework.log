@@ -3,11 +3,27 @@ D:\CSC5803\CSC5803\GameTech 2017\Build\ncltech\SpringConstraint.h(75): warning C
 d:\csc5803\csc5803\gametech 2017\build\gametech coursework\EmptyScene.h(46): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
 d:\csc5803\csc5803\gametech 2017\build\gametech coursework\EmptyScene.h(129): warning C4018: '<': signed/unsigned mismatch
 d:\csc5803\csc5803\gametech 2017\build\gametech coursework\BallPool.h(91): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(10): warning C4005: 'WIDTH': macro redefinition
+  d:\csc5803\csc5803\gametech 2017\build\gametech coursework\BallPool.h(10): note: see previous definition of 'WIDTH'
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(11): warning C4005: 'HEIGHT': macro redefinition
+  d:\csc5803\csc5803\gametech 2017\build\gametech coursework\BallPool.h(11): note: see previous definition of 'HEIGHT'
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(12): warning C4005: 'DEPTH': macro redefinition
+  d:\csc5803\csc5803\gametech 2017\build\gametech coursework\BallPool.h(12): note: see previous definition of 'DEPTH'
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(155): warning C4018: '<': signed/unsigned mismatch
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(160): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(174): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(175): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(190): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(191): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(219): warning C4018: '<': signed/unsigned mismatch
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\CollisionScenarios.h(226): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\TargetScene.h(47): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
+d:\csc5803\csc5803\gametech 2017\build\gametech coursework\TargetScene.h(50): warning C4244: 'argument': conversion from 'double' to 'const float', possible loss of data
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  1 of 3797 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  6 of 3993 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    26 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
 glew32.lib(glew.obj) : warning LNK4099: PDB 'glew_static.pdb' was not found with 'glew32.lib(glew.obj)' or at 'D:\CSC5803\CSC5803\GameTech 2017\Build\Release\glew_static.pdb'; linking object as if no debug info
   GameTech Coursework.vcxproj -> D:\CSC5803\CSC5803\GameTech 2017\Build\Release\GameTech Coursework.exe

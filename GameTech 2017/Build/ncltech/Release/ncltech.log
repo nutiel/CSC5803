@@ -1,18 +1,1 @@
-﻿  CollisionDetectionSAT.cpp
-  CommonMeshes.cpp
-  CommonUtils.cpp
-  CuboidCollisionShape.cpp
-  GeometryUtils.cpp
-  GraphicsPipeline.cpp
-  Hull.cpp
-  Manifold.cpp
-  NetworkBase.cpp
-  Octree.cpp
-Octree.cpp(148): warning C4018: '<': signed/unsigned mismatch
-Octree.cpp(162): warning C4018: '<': signed/unsigned mismatch
-  PhysicsEngine.cpp
-  PhysicsNode.cpp
-  SceneManager.cpp
-  ScreenPicker.cpp
-  SphereCollisionShape.cpp
-  ncltech.vcxproj -> D:\CSC5803\CSC5803\GameTech 2017\Build\Release\ncltech.lib
+﻿  ncltech.vcxproj -> D:\CSC5803\CSC5803\GameTech 2017\Build\Release\ncltech.lib
