@@ -1,0 +1,2 @@
+[10:56:32] [ERROR] d:\csc5803\csc5803\gametech 2017\build\ncltech\networkbase.cpp:36
+[10:56:32] 	  "Unable to initialise Network Host!"
