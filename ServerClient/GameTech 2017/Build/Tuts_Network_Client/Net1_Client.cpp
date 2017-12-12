@@ -87,6 +87,9 @@ produce satisfactory results on the networked peers.
 #include <ncltech\DistanceConstraint.h>
 #include <ncltech\CommonUtils.h>
 
+
+const Vector3 pos_maze = Vector3(0.f, 0.f, 3.f);
+
 enum msg { dens, g_size, grid, message };
 
 //for sending packages of int
@@ -98,7 +101,10 @@ struct P_Data_int {
 //for sending packages with grid info
 struct P_Data_grid {
 	msg m;
-	bool* i;
+	uint s;
+	Vector3 st, en;
+
+	vector<int> grid;
 };
 
 //for sending error messages or handle any other form of communication
@@ -114,7 +120,25 @@ Net1_Client::Net1_Client(const std::string& friendly_name)
 	: Scene(friendly_name)
 	, serverConnection(NULL)
 	, box(NULL)
+	, grid_size(0)
+	, density(0)
+	, astar_preset_idx(2)
+	, astar_preset_text("")
+	, search_as(new SearchAStar())
+	, generator(NULL)
 {
+	wallmesh = new OBJMesh(MESHDIR"cube.obj");
+
+	GLuint whitetex;
+	glGenTextures(1, &whitetex);
+	glBindTexture(GL_TEXTURE_2D, whitetex);
+	unsigned int pixel = 0xFFFFFFFF;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, &pixel);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	wallmesh->SetTexture(whitetex);
+
+	srand(93225); //Set the maze seed to a nice consistent example :)
 }
 
 void Net1_Client::OnInitializeScene()
@@ -129,17 +153,46 @@ void Net1_Client::OnInitializeScene()
 		NCLDebug::Log("Network: Attempting to connect to server.");
 	}
 
-	//Generate Simple Scene with a box that can be updated upon recieving server packets
-	box = CommonUtils::BuildCuboidObject(
-		"Server",
-		Vector3(0.0f, 1.0f, 0.0f),
-		Vector3(0.5f, 0.5f, 0.5f),
-		true,									//Physics Enabled here Purely to make setting position easier via Physics()->SetPosition()
+	GraphicsPipeline::Instance()->GetCamera()->SetPosition(Vector3(-1.5, 25, 1));
+	GraphicsPipeline::Instance()->GetCamera()->SetPitch(-80);
+	GraphicsPipeline::Instance()->GetCamera()->SetYaw(0);
+}
+
+//Could not be needed
+void Net1_Client::GenerateNewMaze()
+{
+	this->DeleteAllGameObjects(); //Cleanup old mazes
+
+	//handled when receiving the package with the MazeGenerator object
+	generator->Generate(grid_size, density);
+
+	//The maze is returned in a [0,0,0] - [1,1,1] cube (with edge walls outside) regardless of grid_size,
+	// so we need to scale it to whatever size we want
+	Matrix4 maze_scalar = Matrix4::Scale(Vector3(5.f, 5.0f / float(grid_size), 5.f)) * Matrix4::Translation(Vector3(-0.5f, 0.f, -0.5f));
+
+	maze = new MazeRenderer(generator, wallmesh);
+	maze->Render()->SetTransform(Matrix4::Translation(pos_maze) * maze_scalar);
+	this->AddGameObject(maze);
+
+
+	//Create Ground (..we still have some common ground to work off)
+	GameObject* ground = CommonUtils::BuildCuboidObject(
+		"Ground",
+		Vector3(0.0f, -1.0f, 0.0f),
+		Vector3(20.0f, 1.0f, 20.0f),
+		false,
 		0.0f,
 		false,
 		false,
 		Vector4(0.2f, 0.5f, 1.0f, 1.0f));
-	this->AddGameObject(box);
+
+	this->AddGameObject(ground);
+
+	//Might need to be handled in the server
+	GraphNode* start = generator->GetStartNode();
+	GraphNode* end = generator->GetGoalNode();
+
+	UpdateAStarPreset();
 }
 
 void Net1_Client::OnCleanupScene()
@@ -169,21 +222,72 @@ void Net1_Client::OnUpdateScene(float dt)
 		std::placeholders::_1);				// Where to place the first parameter
 	network.ServiceNetwork(dt, callback);
 
+	uint drawFlags = PhysicsEngine::Instance()->GetDebugDrawFlags();
 
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "--- Controls ---");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "   [G] To generate a new maze", grid_size);
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "   Grid Size : %2d ([1]/[2] to change)", grid_size);
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "   Density : %2.0f percent ([3]/[4] to change)", density * 100.f);
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "   A-Star Type: \"%s\" ([C] to cycle)", astar_preset_text.c_str());
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "----------------");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "Demonstration of path finding algorithms, and hopefully why A* is");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "so good at the job. See if you can figure out what the pros and cons");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "are of the various A* presets.");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "");
 
-	//Add Debug Information to screen
-	uint8_t ip1 = serverConnection->address.host & 0xFF;
-	uint8_t ip2 = (serverConnection->address.host >> 8) & 0xFF;
-	uint8_t ip3 = (serverConnection->address.host >> 16) & 0xFF;
-	uint8_t ip4 = (serverConnection->address.host >> 24) & 0xFF;
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_G))
+	{
+		//GenerateNewMaze();
+	}
 
-	NCLDebug::DrawTextWs(box->Physics()->GetPosition() + Vector3(0.f, 0.6f, 0.f), STATUS_TEXT_SIZE, TEXTALIGN_CENTRE, Vector4(0.f, 0.f, 0.f, 1.f),
-		"Peer: %u.%u.%u.%u:%u", ip1, ip2, ip3, ip4, serverConnection->address.port);
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_1))
+	{
+		grid_size++;
+		//GenerateNewMaze();
+	}
 
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_2))
+	{
+		grid_size = max(grid_size - 1, 2);
+		//GenerateNewMaze();
+	}
+
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_3))
+	{
+		density = min(density + 0.1f, 1.0f);
+		//GenerateNewMaze();
+	}
+
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_4))
+	{
+		density = max(density - 0.1f, 0.0f);
+		//GenerateNewMaze();
+	}
+
+	if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_C))
+	{
+		astar_preset_idx = (astar_preset_idx + 1) % 4;
+		UpdateAStarPreset();
+	}
+
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "--- Number of nodes searched ---");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "   A-Star       : %4d nodes", search_as->GetSearchHistory().size());
+
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "--- Final path length ---");
+	NCLDebug::AddStatusEntry(Vector4(1.0f, 0.9f, 0.8f, 1.0f), "   A-Star       : %3d", search_as->GetFinalPath().size() - 1);
+
+	NCLDebug::DrawTextWsNDT(pos_maze + Vector3(0, 0, 3.1f), STATUS_TEXT_SIZE, TEXTALIGN_CENTRE, Vector4(0, 0, 0, 1), "A-Star");
+
+	//maze->DrawSearchHistory(search_as->GetSearchHistory(), 2.5f / float(grid_size));
 	
 	NCLDebug::AddStatusEntry(status_color, "Network Traffic");
 	NCLDebug::AddStatusEntry(status_color, "    Incoming: %5.2fKbps", network.m_IncomingKb);
 	NCLDebug::AddStatusEntry(status_color, "    Outgoing: %5.2fKbps", network.m_OutgoingKb);
+
+
 }
 
 void Net1_Client::ProcessNetworkEvent(const ENetEvent& evnt)
@@ -197,15 +301,16 @@ void Net1_Client::ProcessNetworkEvent(const ENetEvent& evnt)
 			{
 				NCLDebug::Log(status_color3, "Network: Successfully connected to server!");
 
-				//Send a 'hello' packet
-				/*char* text_data = "Hellooo!";
-				ENetPacket* packet = enet_packet_create(text_data, strlen(text_data) + 1, 0);
-				enet_peer_send(serverConnection, 0, packet);*/
-
 				P_Data_int *d = (P_Data_int*)malloc(sizeof(P_Data_int));
 				d->m = dens;
 				d->i = 10;
 				ENetPacket* packet = enet_packet_create(d, sizeof(*d), 0);
+				enet_peer_send(serverConnection, 0, packet);
+
+				d->m = g_size;
+				d->i = 5;
+				grid_size = 5;
+				packet = enet_packet_create(d, sizeof(*d), 0);
 				enet_peer_send(serverConnection, 0, packet);
 			}	
 		}
@@ -214,19 +319,26 @@ void Net1_Client::ProcessNetworkEvent(const ENetEvent& evnt)
 
 	//Server has sent us a new packet
 	case ENET_EVENT_TYPE_RECEIVE:
-		{
-			if (evnt.packet->dataLength == sizeof(Vector3))
-			{
-				Vector3 pos;
-				memcpy(&pos, evnt.packet->data, sizeof(Vector3));
-				box->Physics()->SetPosition(pos);
-			}
-			else
-			{
-				NCLERROR("Recieved Invalid Network Packet!");
-			}
 
+		if ((int)*evnt.packet->data == grid) {
+			P_Data_grid *p;
+				
+			p = (P_Data_grid*)evnt.packet->data;
+
+			generator = new MazeGenerator();
+
+			generator->setSize(p->s);
+			generator->setStartV(p->st);
+			generator->setEndV(p->en);
+			generator->setGrid(p->grid);
+			//generator->setGrid("1000111000100111111000101");
+
+			GenerateNewMaze();
 		}
+		else {
+			NCLERROR("Recieved Invalid Network Packet!");
+		}
+
 		break;
 
 
@@ -237,4 +349,44 @@ void Net1_Client::ProcessNetworkEvent(const ENetEvent& evnt)
 		}
 		break;
 	}
+}
+
+void Net1_Client::UpdateAStarPreset()
+{
+	//Example presets taken from:
+	// http://movingai.com/astar-var.html
+	float weightingG, weightingH;
+	switch (astar_preset_idx)
+	{
+	default:
+	case 0:
+		//Only distance from the start node matters - fans out from start node
+		weightingG = 1.0f;
+		weightingH = 0.0f;
+		astar_preset_text = "Dijkstra - None heuristic search";
+		break;
+	case 1:
+		//Only distance to the end node matters
+		weightingG = 0.0f;
+		weightingH = 1.0f;
+		astar_preset_text = "Pure Hueristic search";
+		break;
+	case 2:
+		//Equal weighting
+		weightingG = 1.0f;
+		weightingH = 1.0f;
+		astar_preset_text = "Traditional A-Star";
+		break;
+	case 3:
+		//Greedily goes towards the goal node where possible, but still cares about distance travelled a little bit
+		weightingG = 1.0f;
+		weightingH = 2.0f;
+		astar_preset_text = "Weighted Greedy A-Star";
+		break;
+	}
+	search_as->SetWeightings(weightingG, weightingH);
+
+	GraphNode* start = generator->GetStartNode();
+	GraphNode* end = generator->GetGoalNode();
+	search_as->FindBestPath(start, end);
 }

@@ -40,6 +40,14 @@ FOR MORE NETWORKING INFORMATION SEE "Tuts_Network_Client -> Net1_Client.h"
 #include <nclgl\common.h>
 #include <ncltech\NetworkBase.h>
 
+#include "MazeGenerator.h"
+#include "MazeRenderer.h"
+#include "SearchAStar.h"
+#include <nclgl\OBJMesh.h>
+#include <deque>
+#include <list>
+#include <unordered_map>
+
 //Needed to get computer adapter IPv4 addresses via windows
 #include <iphlpapi.h>
 #pragma comment(lib, "IPHLPAPI.lib")
@@ -59,7 +67,10 @@ struct P_Data_int {
 //for sending packages with grid info
 struct P_Data_grid {
 	msg m;
-	bool* i;
+	uint s;
+	Vector3 st, en;
+
+	vector<int> grid;
 };
 
 //for sending error messages or handle any other form of communication
@@ -72,7 +83,10 @@ NetworkBase server;
 GameTimer timer;
 float accum_time = 0.0f;
 float rotation = 0.0f;
-int density, grid_size;
+int density = 0, grid_size = 0;
+bool flag = false;
+
+MazeGenerator* generator;
 
 void Win32_PrintAllAdapterIPAddresses();
 
@@ -100,6 +114,7 @@ int main(int arcg, char** argv)
 
 	printf("Server Initiated\n");
 
+	generator = new MazeGenerator();
 
 	Win32_PrintAllAdapterIPAddresses();
 
@@ -125,17 +140,29 @@ int main(int arcg, char** argv)
 					P_Data_int *p = (P_Data_int*)evnt.packet->data;
 
 					density = p->i;
+
+					std::cout << density << std::endl;
+					
+					//Genrate new grid each time new params are sent
+					if (grid_size != 0) {
+						flag = true;
+					}
 				}
 				else if ((int)*evnt.packet->data == g_size) {
 					P_Data_int *p = (P_Data_int*)evnt.packet->data;
 
 					grid_size = p->i;
-				}
-				else if ((int)*evnt.packet->data == grid) {
-					/*handle grid creation and send back*/
-				}
 
-				std::cout << density;
+					std::cout << grid_size << std::endl;
+
+					//Genrate new grid each time new params are sent
+					if (density != 0) {
+						flag = true;
+					}
+				}
+				else if ((int)*evnt.packet->data == message) {
+					/*handle appropriately*/
+				}
 
 				enet_packet_destroy(evnt.packet);
 				break;
@@ -155,14 +182,26 @@ int main(int arcg, char** argv)
 			//   though this can be any variable, structure or class you wish. Just remember that everything 
 			//   you send takes up valuable network bandwidth so no sending every PhysicsObject struct each frame ;)
 			accum_time = 0.0f;
-			Vector3 pos = Vector3(
-				cos(rotation) * 2.0f,
-				1.5f,
-				sin(rotation) * 2.0f);
 
-			//Create the packet and broadcast it (unreliable transport) to all clients
-			ENetPacket* position_update = enet_packet_create(&pos, sizeof(Vector3), 0);
-			enet_host_broadcast(server.m_pNetwork, 0, position_update);
+			if (flag) {
+
+				generator->Generate(grid_size, (float)density);
+				generator->genBoolGrid();
+
+				P_Data_grid g;// = (P_Data_grid*)malloc(sizeof(P_Data_grid) + generator->GetSize()*generator->GetSize());
+
+				g.m = grid;
+				g.s = generator->GetSize();
+				g.st = generator->GetStartNode()->_pos;
+				g.en = generator->GetGoalNode()->_pos;
+				g.grid = generator->getGrid();
+
+				ENetPacket* grid = enet_packet_create(&g, sizeof(g), 0);
+				enet_host_broadcast(server.m_pNetwork, 0, grid);
+
+				flag = false;
+			}
+
 		}
 
 		Sleep(0);
