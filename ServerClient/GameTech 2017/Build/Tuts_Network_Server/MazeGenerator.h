@@ -31,27 +31,15 @@ public:
 	void setAllEdges(GraphEdge* allE) { allEdges = allE; }
 
 	void genBoolGrid() {
-		grid = new bool[size*size];
-
-		int a, b;
 
 		for (uint i = 0; i < 2 * size * (size - 1); i++) {
-			a = (int)(allEdges[i]._a->_pos.x + size*allEdges[i]._a->_pos.y);
-			b = (int)(allEdges[i]._b->_pos.x + size*allEdges[i]._b->_pos.y);
-
-			grid[a] = false;
-			grid[a] = false;
-
-			if (!allEdges[i]._iswall) {
-				grid[a] = true;
-				grid[b] = true;
-			}
+			grid.push_back(allEdges[i]._iswall);
 		}
 	}
 
 	vector<int> getGrid() {
 		vector<int> v;
-		for (uint i = 0; i < size*size; i++) {
+		for (uint i = 0; i < 2 * size * (size - 1); i++) {
 			v.push_back(grid[i]);
 		}
 		return v;
@@ -74,7 +62,7 @@ public:
 	uint size;
 	GraphNode *start, *end;
 
-	bool* grid;
+	vector<bool> grid;
 
 	GraphNode* allNodes;
 	GraphEdge* allEdges;

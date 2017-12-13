@@ -88,30 +88,7 @@ produce satisfactory results on the networked peers.
 #include <ncltech\CommonUtils.h>
 
 
-const Vector3 pos_maze = Vector3(0.f, 0.f, 3.f);
-
-enum msg { dens, g_size, grid, message };
-
-//for sending packages of int
-struct P_Data_int {
-	msg m;
-	int i;
-};
-
-//for sending packages with grid info
-struct P_Data_grid {
-	msg m;
-	uint s;
-	Vector3 st, en;
-
-	vector<int> grid;
-};
-
-//for sending error messages or handle any other form of communication
-struct P_Data_msg {
-	msg m;
-	char* messg;
-};
+const Vector3 pos_maze = Vector3(0.f, 0.f, 5.f);
 
 const Vector3 status_color3 = Vector3(1.0f, 0.6f, 0.6f);
 const Vector4 status_color = Vector4(status_color3.x, status_color3.y, status_color3.z, 1.0f);
@@ -164,13 +141,14 @@ void Net1_Client::GenerateNewMaze()
 	this->DeleteAllGameObjects(); //Cleanup old mazes
 
 	//handled when receiving the package with the MazeGenerator object
-	generator->Generate(grid_size, density);
+	//generator->Generate(grid_size, density);
 
 	//The maze is returned in a [0,0,0] - [1,1,1] cube (with edge walls outside) regardless of grid_size,
 	// so we need to scale it to whatever size we want
 	Matrix4 maze_scalar = Matrix4::Scale(Vector3(5.f, 5.0f / float(grid_size), 5.f)) * Matrix4::Translation(Vector3(-0.5f, 0.f, -0.5f));
 
-	maze = new MazeRenderer(generator, wallmesh);
+	maze = new MazeRenderer(p->grid, p->s, p->st, p->en, wallmesh);
+
 	maze->Render()->SetTransform(Matrix4::Translation(pos_maze) * maze_scalar);
 	this->AddGameObject(maze);
 
@@ -189,10 +167,10 @@ void Net1_Client::GenerateNewMaze()
 	this->AddGameObject(ground);
 
 	//Might need to be handled in the server
-	GraphNode* start = generator->GetStartNode();
-	GraphNode* end = generator->GetGoalNode();
+	//GraphNode* start = generator->GetStartNode();
+	//GraphNode* end = generator->GetGoalNode();
 
-	UpdateAStarPreset();
+	//UpdateAStarPreset();
 }
 
 void Net1_Client::OnCleanupScene()
@@ -309,7 +287,7 @@ void Net1_Client::ProcessNetworkEvent(const ENetEvent& evnt)
 
 				d->m = g_size;
 				d->i = 5;
-				grid_size = 5;
+				grid_size = 7;
 				packet = enet_packet_create(d, sizeof(*d), 0);
 				enet_peer_send(serverConnection, 0, packet);
 			}	
@@ -321,17 +299,25 @@ void Net1_Client::ProcessNetworkEvent(const ENetEvent& evnt)
 	case ENET_EVENT_TYPE_RECEIVE:
 
 		if ((int)*evnt.packet->data == grid) {
-			P_Data_grid *p;
-				
+			
+			p = (P_Data_grid*)malloc(sizeof(P_Data_grid));
+
 			p = (P_Data_grid*)evnt.packet->data;
 
-			generator = new MazeGenerator();
+			int actualGrid = (sizeof(msg) + sizeof(uint) + 2 * sizeof(p->st)) / sizeof(enet_uint8);
+			int gridSize = (2 * p->s*(p->s - 1));
 
-			generator->setSize(p->s);
-			generator->setStartV(p->st);
-			generator->setEndV(p->en);
-			generator->setGrid(p->grid);
-			//generator->setGrid("1000111000100111111000101");
+			std::vector<int> v;
+			int* array = new int[gridSize];
+			memcpy(array, &evnt.packet->data[actualGrid], gridSize * sizeof(int));
+			for (int i = 0; i < gridSize; ++i)
+			{
+				v.push_back(array[i]);
+
+			}
+			
+			p->grid.reserve(v.size());
+			p->grid = v;
 
 			GenerateNewMaze();
 		}

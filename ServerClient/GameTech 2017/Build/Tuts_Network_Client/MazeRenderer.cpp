@@ -25,6 +25,37 @@ MazeRenderer::MazeRenderer(MazeGenerator* gen, Mesh* wallmesh)
 	}
 }
 
+MazeRenderer::MazeRenderer(vector<int> v, uint s, Vector3 start, Vector3 end, Mesh* wallmesh)
+	: GameObject("")
+	, mesh(wallmesh)
+	, maze(NULL)
+	, flat_maze(NULL)
+	, flat_maze_size(s*3 - 1)
+	, st(start)
+	, en(end)
+{
+	this->SetRender(new RenderNode());
+
+	flat_maze = new bool[flat_maze_size * flat_maze_size];
+	memset(flat_maze, 0, flat_maze_size * flat_maze_size * sizeof(bool));
+
+	for (int i = 0; i < flat_maze_size; ++i) {
+		
+		if (v[i] == 0) {
+			flat_maze[i] = false;
+		}
+		else {
+			flat_maze[i] = true;
+		}
+	}
+	
+ 	wall_descriptors.reserve(getNumWalls());
+
+	Generate_ConstructWalls();
+
+	Generate_BuildRenderNodes();
+}
+
 MazeRenderer::~MazeRenderer()
 {
 	mesh = NULL;
@@ -62,6 +93,56 @@ void MazeRenderer::DrawSearchHistory(const SearchHistory& history, float line_wi
 		NCLDebug::DrawThickLine(start, end, line_width, CommonUtils::GenColor(0.8f + index * col_factor));
 		index += 1.0f;
 	}
+}
+
+uint MazeRenderer::getNumWalls(){
+	uint size = (flat_maze_size + 1)/3;
+	uint base_offset = size * (size - 1);
+	uint num_walls = 0;
+
+	//Iterate over each cell in the maze
+	for (uint y = 0; y < size; ++y)
+	{
+		uint y3 = y * 3;
+		for (uint x = 0; x < size; ++x)
+		{
+			int x3 = x * 3;
+
+			//Lookup the corresponding edges that occupy that grid cell
+			// and if they are walls, set plot their locations on our 2D
+			// map.
+			//- Yes... it's a horrible branching inner for-loop, my bad! :(
+			if (x < size - 1)
+			{
+				
+				if (flat_maze[(y * (size - 1) + x)])
+				{
+					flat_maze[(y * 3) * flat_maze_size + (x * 3 + 2)] = true;
+					flat_maze[(y * 3 + 1) * flat_maze_size + (x * 3 + 2)] = true;
+					num_walls += 2;
+				}
+			}
+			if (y < size - 1)
+			{
+				if (flat_maze[base_offset + (x * (size - 1) + y)])
+				{
+					flat_maze[(y * 3 + 2) * flat_maze_size + (x * 3)] = true;
+					flat_maze[(y * 3 + 2) * flat_maze_size + (x * 3 + 1)] = true;
+					num_walls += 2;
+				}
+			}
+
+			//As it's now a 3x3 cell for each, and the doorways are 2x1 or 1x2
+			// we need to add an extra wall for the diagonals.
+			if (x < size - 1 && y < size - 1)
+			{
+				flat_maze[(y3 + 2) * flat_maze_size + x3 + 2] = true;
+				num_walls++;
+			}
+		}
+	}
+
+	return num_walls;
 }
 
 uint MazeRenderer::Generate_FlatMaze()
@@ -241,13 +322,11 @@ void MazeRenderer::Generate_BuildRenderNodes()
 
 
 //Finally - our start/end goals
-	GraphNode* start = maze->GetStartNode();
-	GraphNode* end = maze->GetGoalNode();
 
 	Vector3 cellpos = Vector3(
-		start->_pos.x * 3,
+		st.x * 3,
 		0.0f,
-		start->_pos.y * 3
+		st.y * 3
 	) * scalar;
 	Vector3 cellsize = Vector3(
 		scalar * 2,
@@ -260,9 +339,9 @@ void MazeRenderer::Generate_BuildRenderNodes()
 	root->AddChild(cube);
 
 	cellpos = Vector3(
-		end->_pos.x * 3,
+		en.x * 3,
 		0.0f,
-		end->_pos.y * 3
+		en.y * 3
 	) * scalar;
 	cube = new RenderNode(mesh, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 	cube->SetTransform(Matrix4::Translation(cellpos + cellsize * 0.5f) * Matrix4::Scale(cellsize * 0.5f));

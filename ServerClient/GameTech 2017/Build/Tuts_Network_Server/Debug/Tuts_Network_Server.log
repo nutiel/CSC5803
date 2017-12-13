@@ -1,8 +1,5 @@
 ﻿  main.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  MazeRenderer.cpp
-  MazeGenerator.cpp
+d:\csc5803\csc5803\serverclient\gametech 2017\build\tuts_network_server\main.cpp(206): warning C4018: '<': signed/unsigned mismatch
   SOIL.lib(SOIL.obj) : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
 LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
 main.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:LBR' specification

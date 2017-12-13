@@ -14,6 +14,29 @@
 
 //Basic Network Example
 
+enum msg { dens, g_size, grid, message };
+
+//for sending packages of int
+struct P_Data_int {
+	msg m;
+	int i;
+};
+
+//for sending packages with grid info
+struct P_Data_grid {
+	msg m;
+	uint s;
+	Vector3 st, en;
+
+	vector<int> grid;
+};
+
+//for sending error messages or handle any other form of communication
+struct P_Data_msg {
+	msg m;
+	char* messg;
+};
+
 class Net1_Client : public Scene
 {
 public:
@@ -42,6 +65,8 @@ protected:
 	MazeGenerator* generator;
 	MazeRenderer* maze;
 	SearchAStar* search_as;
+
+	P_Data_grid* p;
 
 	int grid_size;
 	float density;

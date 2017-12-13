@@ -99,6 +99,8 @@ int onExit(int exitcode)
 
 int main(int arcg, char** argv)
 {
+	srand(93225);
+
 	if (enet_initialize() != 0)
 	{
 		fprintf(stderr, "An error occurred while initializing ENet.\n");
@@ -188,7 +190,7 @@ int main(int arcg, char** argv)
 				generator->Generate(grid_size, (float)density);
 				generator->genBoolGrid();
 
-				P_Data_grid g;// = (P_Data_grid*)malloc(sizeof(P_Data_grid) + generator->GetSize()*generator->GetSize());
+				P_Data_grid g;
 
 				g.m = grid;
 				g.s = generator->GetSize();
@@ -196,7 +198,17 @@ int main(int arcg, char** argv)
 				g.en = generator->GetGoalNode()->_pos;
 				g.grid = generator->getGrid();
 
-				ENetPacket* grid = enet_packet_create(&g, sizeof(g), 0);
+				int arraySize = (sizeof(msg) + sizeof(uint) + 2 * sizeof(g.st)) / sizeof(int) + g.grid.size();
+				int* array = new int[arraySize];
+				memcpy(array, &g, sizeof(msg) + sizeof(uint) + 2 * sizeof(g.st));
+				int actualGrid = (sizeof(msg) + sizeof(uint) + 2 * sizeof(g.st)) / sizeof(int);
+
+				for (int i = 0; i < g.grid.size(); ++i)
+				{
+					array[actualGrid + i] = g.grid[i];
+				}
+				
+				ENetPacket* grid = enet_packet_create(array, arraySize * sizeof(int), 0);
 				enet_host_broadcast(server.m_pNetwork, 0, grid);
 
 				flag = false;

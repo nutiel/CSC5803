@@ -21,6 +21,8 @@ class MazeRenderer : public GameObject
 {
 public:
 	MazeRenderer(MazeGenerator* gen, Mesh* wallmesh = CommonMeshes::Cube());
+	MazeRenderer(vector<int> v, uint s, Vector3 start, Vector3 end, Mesh* wallmesh = CommonMeshes::Cube());
+
 	virtual ~MazeRenderer();
 
 	//The search history draws from edges because they already store the 'to'
@@ -34,7 +36,7 @@ protected:
 	// - False for empty
 	//Returns uint: Guess at the number of walls required
 	uint Generate_FlatMaze(); 
-
+	uint getNumWalls();
 	//Construct a list of WallDescriptors from the flat 2D map generated above.
 	void Generate_ConstructWalls();
 
@@ -50,4 +52,6 @@ protected:
 	uint	flat_maze_size;
 
 	WallDescriptorVec	wall_descriptors;
+
+	Vector3 st, en;
 };
